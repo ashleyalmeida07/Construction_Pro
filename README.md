@@ -127,6 +127,8 @@ Server runs at `http://localhost:3000`. Sequelize will create any missing tables
 
 Postman collection is included: `postman_collection.json`
 
+Or open it directly: [View in Postman](https://web.postman.co/workspace/My-Workspace~d2e32bca-568a-482b-8380-41ba2a9d05f9/collection/44526722-d6581111-5b23-44fe-9e8e-f5a9abac0a16?action=share&source=copy-link&creator=44526722)
+
 **Register**
 ```bash
 curl -X POST http://localhost:3000/auth/register \
