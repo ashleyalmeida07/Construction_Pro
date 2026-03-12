@@ -1,8 +1,4 @@
--- Run this in MySQL to create the database and tables manually
--- (Sequelize will also auto-create tables on server start, but this is for reference)
 
-CREATE DATABASE IF NOT EXISTS construction_db;
-USE construction_db;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
