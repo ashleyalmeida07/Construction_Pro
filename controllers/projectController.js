@@ -93,6 +93,8 @@ const deleteProject = async (req, res) => {
       return res.status(404).json({ error: 'Project not found.' });
     }
 
+    // Delete related daily reports first to avoid FK constraint violation
+    await DailyReport.destroy({ where: { project_id: req.params.id } });
     await project.destroy();
     return res.status(200).json({ message: 'Project deleted successfully.' });
   } catch (err) {

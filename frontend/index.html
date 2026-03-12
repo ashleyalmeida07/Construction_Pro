@@ -687,6 +687,55 @@
     .mt-12 { margin-top: 12px; }
     .flex-gap { display: flex; gap: 10px; }
 
+    /* ── CONFIRM MODAL ── */
+    .confirm-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+      animation: modalIn 0.2s ease;
+      overflow: hidden;
+    }
+
+    .confirm-modal::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--error);
+    }
+
+    .confirm-modal-body {
+      padding: 28px 24px 20px;
+    }
+
+    .confirm-modal-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .confirm-modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .confirm-modal-msg {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .confirm-modal-actions {
+      display: flex;
+      gap: 10px;
+      padding: 0 24px 24px;
+      justify-content: flex-end;
+    }
+
     @media (max-width: 768px) {
       .page-header {
         flex-direction: column;
@@ -849,6 +898,21 @@
 <!-- ══════════════════════════════════════════
      MODALS
 ══════════════════════════════════════════ -->
+
+<!-- Confirm Dialog -->
+<div id="confirm-modal" class="modal-overlay hidden">
+  <div class="confirm-modal">
+    <div class="confirm-modal-body">
+      <div class="confirm-modal-icon">🗑️</div>
+      <div class="confirm-modal-title" id="confirm-title">Are you sure?</div>
+      <div class="confirm-modal-msg" id="confirm-msg">This action cannot be undone.</div>
+    </div>
+    <div class="confirm-modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="resolveConfirm(false)">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="confirm-ok-btn" onclick="resolveConfirm(true)">Delete</button>
+    </div>
+  </div>
+</div>
 
 <!-- Create/Edit Project Modal -->
 <div id="project-modal" class="modal-overlay hidden">
@@ -1240,7 +1304,8 @@
     const requestKey = `project-delete-${id}`;
     const triggerBtn = e?.currentTarget || document.getElementById('delete-project-btn');
     const defaultLabel = triggerBtn?.textContent?.trim() || 'Delete';
-    if (!confirm('Delete this project? This cannot be undone.')) return;
+    const confirmed = await showConfirm('Delete Project', 'This will permanently delete the project and all its daily reports.');
+    if (!confirmed) return;
     if (!startRequest(requestKey)) return;
 
     if (triggerBtn) setButtonLoading(triggerBtn, true, defaultLabel, 'Deleting');
@@ -1301,7 +1366,8 @@
   async function deleteDPR(dprId, e) {
     const requestKey = `dpr-delete-${dprId}`;
     const triggerBtn = e?.currentTarget || null;
-    if (!confirm('Delete this report?')) return;
+    const confirmed = await showConfirm('Delete Report', 'This daily progress report will be permanently deleted.');
+    if (!confirmed) return;
     if (!startRequest(requestKey)) return;
 
     if (triggerBtn) setButtonLoading(triggerBtn, true, '✕', '...');
@@ -1342,6 +1408,20 @@
     document.getElementById(id).classList.add('hidden');
   }
 
+  let _confirmResolve = null;
+
+  function showConfirm(title, msg) {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+    return new Promise(resolve => { _confirmResolve = resolve; });
+  }
+
+  function resolveConfirm(result) {
+    document.getElementById('confirm-modal').classList.add('hidden');
+    if (_confirmResolve) { _confirmResolve(result); _confirmResolve = null; }
+  }
+
   function startRequest(key) {
     if (pendingRequests.has(key)) return false;
     pendingRequests.add(key);
@@ -1369,7 +1449,13 @@
   // Close modal on overlay click
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.classList.add('hidden');
+      if (e.target === overlay) {
+        if (overlay.id === 'confirm-modal') {
+          resolveConfirm(false);
+        } else {
+          overlay.classList.add('hidden');
+        }
+      }
     });
   });
 

@@ -5,7 +5,13 @@ const isUrlConfig = Boolean(process.env.DATABASE_URL);
 
 const sequelize = isUrlConfig
   ? new Sequelize(process.env.DATABASE_URL, {
-      dialect: 'mysql',
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      },
       logging: false,
     })
   : new Sequelize(
@@ -14,8 +20,8 @@ const sequelize = isUrlConfig
       process.env.DB_PASSWORD || '',
       {
         host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT || '3306', 10),
-        dialect: 'mysql',
+        port: parseInt(process.env.DB_PORT || '5432', 10),
+        dialect: 'postgres',
         logging: false,
       }
     );
