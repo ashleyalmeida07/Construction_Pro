@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ConstructPro — Site Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #f5a623;
+      --accent2: #e8530a;
+      --text: #f0ede8;
+      --muted: #666;
+      --success: #3ecf8e;
+      --error: #ff4d4d;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 13px;
+    }
+
+    /* ── AUTH SCREEN ── */
+    #auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #auth-screen::before {
+      content: 'CONSTRUCTPRO';
+      position: absolute;
+      font-family: 'Syne', sans-serif;
+      font-size: 18vw;
+      font-weight: 800;
+      color: #ffffff04;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: -0.05em;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 40px;
+      width: 400px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+    }
+
+    .auth-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .auth-logo span { color: var(--accent); }
+
+    .auth-sub {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 32px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 10px 20px;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      justify-content: center;
+    }
+
+    .btn-primary:hover { background: var(--accent2); color: #fff; }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-loading {
+      pointer-events: none;
+    }
+
+    .btn-loading .spinner {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      border-left-color: transparent;
+      border-bottom-color: transparent;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid #ff4d4d44;
+      color: var(--error);
+    }
+
+    .btn-danger:hover { background: #ff4d4d22; }
+
+    .btn-success {
+      background: var(--success);
+      color: #000;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      z-index: 999;
+      animation: slideUp 0.3s ease;
+      max-width: 320px;
+    }
+
+    .toast.success { background: var(--success); color: #000; }
+    .toast.error { background: var(--error); color: #fff; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MAIN APP ── */
+    #app-screen { display: none; min-height: 100vh; }
+
+    .topbar {
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+      margin-right: 8px;
+    }
+
+    .topbar-logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 4px; flex: 1; }
+
+    .nav-link {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 6px 14px;
+      cursor: pointer;
+      border-radius: var(--radius);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover { color: var(--text); background: var(--surface2); }
+    .nav-link.active { color: var(--accent); background: #f5a62315; }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .user-role {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: #f5a62320;
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid #f5a62340;
+    }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 5px 12px;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover { color: var(--error); border-color: var(--error); }
+
+    .main-content {
+      padding: 32px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── PAGE HEADERS ── */
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .page-title span {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 6px 14px;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    /* ── PROJECT GRID ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+
+    .project-card:hover { border-color: #444; transform: translateY(-1px); }
+    .project-card:hover::before { background: var(--accent); }
+
+    .project-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .project-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      flex: 1;
+      padding-right: 12px;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .status-planned { background: #3b82f620; color: #60a5fa; border: 1px solid #3b82f640; }
+    .status-active { background: #3ecf8e20; color: var(--success); border: 1px solid #3ecf8e40; }
+    .status-completed { background: #f5a62320; color: var(--accent); border: 1px solid #f5a62340; }
+
+    .project-desc {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .project-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .project-meta-item { display: flex; align-items: center; gap: 5px; }
+
+    .project-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .modal-header {
+      padding: 24px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body { padding: 0 24px 24px; }
+
+    /* ── DPR TABLE ── */
+    .dpr-section { margin-top: 32px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .dpr-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .dpr-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .dpr-date {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .dpr-info { display: flex; flex-direction: column; gap: 6px; }
+
+    .dpr-desc { font-size: 12px; line-height: 1.6; }
+
+    .dpr-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .dpr-tag {
+      font-size: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--muted);
+    }
+
+    /* ── DETAIL VIEW ── */
+    #detail-view { display: none; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 24px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover { color: var(--accent); }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .detail-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .meta-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .meta-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 13px; margin-bottom: 16px; }
+
+    /* ── LOADING ── */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .hidden { display: none !important; }
+    .w-full { width: 100%; }
+    .mt-12 { margin-top: 12px; }
+    .flex-gap { display: flex; gap: 10px; }
+
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      #create-project-btn {
+        width: auto;
+      }
+
+      .detail-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">Construct<span>Pro</span></div>
+    <div class="auth-sub">Site Management System</div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+      <button class="tab-btn" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••"/>
+      </div>
+      <button class="btn btn-primary mt-12 w-full" id="login-submit-btn" onclick="login()">Login →</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" class="hidden">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Name"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="min 6 characters"/>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="reg-role">
+          <option value="worker">Worker</option>
+          <option value="manager">Manager</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button class="btn btn-primary mt-12 w-full" id="register-submit-btn" onclick="register()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════ -->
+<div id="app-screen">
+  <nav class="topbar">
+    <div class="topbar-logo">Construct<span>Pro</span></div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('projects')" id="nav-projects">Projects</button>
+    </div>
+    <div class="user-badge">
+      <span id="user-name-display"></span>
+      <span class="user-role" id="user-role-display"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main-content">
+
+    <!-- PROJECTS LIST PAGE -->
+    <div id="projects-page">
+      <div class="page-header">
+        <div class="page-title">
+          <span>Overview</span>
+          Projects
+        </div>
+        <button class="btn btn-primary btn-sm" id="create-project-btn" onclick="openProjectModal()">+ New Project</button>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterProjects('all', this)">All</button>
+        <button class="filter-btn" onclick="filterProjects('planned', this)">Planned</button>
+        <button class="filter-btn" onclick="filterProjects('active', this)">Active</button>
+        <button class="filter-btn" onclick="filterProjects('completed', this)">Completed</button>
+      </div>
+
+      <div id="projects-container">
+        <div class="loading">Loading projects</div>
+      </div>
+    </div>
+
+    <!-- PROJECT DETAIL PAGE -->
+    <div id="detail-view">
+      <button class="back-btn" onclick="backToProjects()">← Back to Projects</button>
+
+      <div class="detail-header">
+        <div>
+          <div class="detail-title" id="detail-name"></div>
+          <div style="margin-top:8px" id="detail-status-badge"></div>
+        </div>
+        <div class="flex-gap">
+          <button class="btn btn-ghost btn-sm" id="edit-project-btn">Edit</button>
+          <button class="btn btn-danger btn-sm" id="delete-project-btn">Delete</button>
+        </div>
+      </div>
+
+      <div class="detail-meta">
+        <div class="meta-card">
+          <div class="meta-label">Start Date</div>
+          <div class="meta-value" id="detail-start"></div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">End Date</div>
+          <div class="meta-value" id="detail-end"></div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Created By</div>
+          <div class="meta-value" id="detail-creator"></div>
+        </div>
+      </div>
+
+      <div style="color:var(--muted);font-size:12px;line-height:1.7;margin-bottom:24px" id="detail-desc"></div>
+
+      <!-- DPR SECTION -->
+      <div class="dpr-section">
+        <div class="section-header">
+          <div class="section-title">Daily Progress Reports</div>
+          <button class="btn btn-success btn-sm" onclick="openDPRModal()">+ Add DPR</button>
+        </div>
+        <div id="dpr-container">
+          <div class="loading">Loading reports</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+
+<!-- Create/Edit Project Modal -->
+<div id="project-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="project-modal-title">New Project</div>
+      <button class="modal-close" onclick="closeModal('project-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-project-id"/>
+      <div class="form-group">
+        <label>Project Name *</label>
+        <input type="text" id="proj-name" placeholder="e.g. Bridge Construction Phase 1"/>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="proj-desc" placeholder="What is this project about?"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="proj-start"/>
+        </div>
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="date" id="proj-end"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="proj-status">
+          <option value="planned">Planned</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <button class="btn btn-primary w-full mt-12" id="project-submit-btn" onclick="submitProject()">Create Project →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create DPR Modal -->
+<div id="dpr-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Daily Report</div>
+      <button class="modal-close" onclick="closeModal('dpr-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Date *</label>
+        <input type="date" id="dpr-date"/>
+      </div>
+      <div class="form-group">
+        <label>Work Description *</label>
+        <textarea id="dpr-desc" placeholder="What work was done today?"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Weather</label>
+          <input type="text" id="dpr-weather" placeholder="e.g. Sunny, 28°C"/>
+        </div>
+        <div class="form-group">
+          <label>Worker Count</label>
+          <input type="number" id="dpr-workers" placeholder="e.g. 25" min="0"/>
+        </div>
+      </div>
+      <button class="btn btn-primary w-full mt-12" id="dpr-submit-btn" onclick="submitDPR()">Submit Report →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ══════════════════════════════════════════
+  // CONFIG — change this to your backend URL
+  // ══════════════════════════════════════════
+  const API = 'http://localhost:3000';
+
+  // ── State ──
+  let token = localStorage.getItem('token');
+  let currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+  let currentProjectId = null;
+  let allProjects = [];
+  let currentFilter = 'all';
+  const pendingRequests = new Set();
+
+  // ── Init ──
+  if (token && currentUser) showApp();
+
+  // ══════════════════════════════════════════
+  // AUTH
+  // ══════════════════════════════════════════
+  function switchTab(tab) {
+    document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+    });
+  }
+
+  async function login() {
+    const submitBtn = document.getElementById('login-submit-btn');
+    const requestKey = 'auth-login';
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) return toast('Enter email and password', 'error');
+    if (!startRequest(requestKey)) return;
+
+    setButtonLoading(submitBtn, true, 'Login →', 'Logging in');
+    try {
+      const res = await api('/auth/login', 'POST', { email, password }, false);
+      if (res.token) {
+        token = res.token;
+        currentUser = res.user;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        showApp();
+        toast('Welcome back, ' + currentUser.name + '!', 'success');
+      } else {
+        toast(res.error || 'Login failed', 'error');
+      }
+    } finally {
+      setButtonLoading(submitBtn, false, 'Login →', 'Logging in');
+      endRequest(requestKey);
+    }
+  }
+
+  async function register() {
+    const submitBtn = document.getElementById('register-submit-btn');
+    const requestKey = 'auth-register';
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('reg-role').value;
+    if (!name || !email || !password) return toast('All fields are required', 'error');
+    if (!startRequest(requestKey)) return;
+
+    setButtonLoading(submitBtn, true, 'Create Account →', 'Signing up');
+    try {
+      const res = await api('/auth/register', 'POST', { name, email, password, role }, false);
+      if (res.userId) {
+        toast('Account created! Please login.', 'success');
+        switchTab('login');
+        document.getElementById('login-email').value = email;
+      } else {
+        toast(res.error || 'Registration failed', 'error');
+      }
+    } finally {
+      setButtonLoading(submitBtn, false, 'Create Account →', 'Signing up');
+      endRequest(requestKey);
+    }
+  }
+
+  function logout() {
+    token = null; currentUser = null;
+    localStorage.clear();
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+
+  // ══════════════════════════════════════════
+  // SHOW APP
+  // ══════════════════════════════════════════
+  function showApp() {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('user-name-display').textContent = currentUser.name;
+    document.getElementById('user-role-display').textContent = currentUser.role;
+
+    // Show create button only for admin/manager
+    const canCreate = ['admin', 'manager'].includes(currentUser.role);
+    document.getElementById('create-project-btn').classList.toggle('hidden', !canCreate);
+
+    loadProjects();
+  }
+
+  // ══════════════════════════════════════════
+  // PROJECTS
+  // ══════════════════════════════════════════
+  async function loadProjects() {
+    const requestKey = 'projects-load';
+    if (!startRequest(requestKey)) return;
+    document.getElementById('projects-container').innerHTML = '<div class="loading">Loading projects</div>';
+    try {
+      const res = await api('/projects?limit=100');
+      if (res.projects) {
+        allProjects = res.projects;
+        renderProjects();
+      }
+    } finally {
+      endRequest(requestKey);
+    }
+  }
+
+  function filterProjects(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProjects();
+  }
+
+  function renderProjects() {
+    const filtered = currentFilter === 'all'
+      ? allProjects
+      : allProjects.filter(p => p.status === currentFilter);
+
+    const container = document.getElementById('projects-container');
+
+    if (!filtered.length) {
+      container.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🏗️</div>
+          <div class="empty-text">No projects found</div>
+          ${['admin','manager'].includes(currentUser.role) ? '<button class="btn btn-ghost btn-sm" onclick="openProjectModal()">Create your first project</button>' : ''}
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="projects-grid">${filtered.map(projectCard).join('')}</div>`;
+  }
+
+  function projectCard(p) {
+    const canEdit = ['admin', 'manager'].includes(currentUser.role);
+    const canDelete = currentUser.role === 'admin';
+    return `
+      <div class="project-card">
+        <div class="project-card-top">
+          <div class="project-name">${p.name}</div>
+          <span class="status-badge status-${p.status}">${p.status}</span>
+        </div>
+        <div class="project-desc">${p.description || 'No description provided.'}</div>
+        <div class="project-meta">
+          <div class="project-meta-item">📅 ${p.start_date || 'TBD'}</div>
+          <div class="project-meta-item">👤 ${p.creator?.name || 'Unknown'}</div>
+        </div>
+        <div class="project-actions">
+          <button class="btn btn-ghost btn-sm" onclick="viewProject(${p.id}, event)">View Details</button>
+          ${canEdit ? `<button class="btn btn-ghost btn-sm" onclick="editProject(${p.id}, event)">Edit</button>` : ''}
+          ${canDelete ? `<button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id}, event)">Delete</button>` : ''}
+        </div>
+      </div>`;
+  }
+
+  async function viewProject(id, e) {
+    if (e) e.stopPropagation();
+    const requestKey = `project-view-${id}`;
+    if (!startRequest(requestKey)) return;
+    const triggerBtn = e?.currentTarget || null;
+    if (triggerBtn) setButtonLoading(triggerBtn, true, 'View Details', 'Opening');
+
+    currentProjectId = id;
+    document.getElementById('projects-page').style.display = 'none';
+    document.getElementById('detail-view').style.display = 'block';
+    document.getElementById('dpr-container').innerHTML = '<div class="loading">Loading reports</div>';
+
+    try {
+      const res = await api(`/projects/${id}`);
+      const p = res.project;
+      if (!p) return toast('Project not found', 'error');
+
+      document.getElementById('detail-name').textContent = p.name;
+      document.getElementById('detail-status-badge').innerHTML = `<span class="status-badge status-${p.status}">${p.status}</span>`;
+      document.getElementById('detail-start').textContent = p.start_date || 'N/A';
+      document.getElementById('detail-end').textContent = p.end_date || 'N/A';
+      document.getElementById('detail-creator').textContent = p.creator?.name || 'Unknown';
+      document.getElementById('detail-desc').textContent = p.description || 'No description.';
+
+      const canEdit = ['admin', 'manager'].includes(currentUser.role);
+      const canDelete = currentUser.role === 'admin';
+      document.getElementById('edit-project-btn').classList.toggle('hidden', !canEdit);
+      document.getElementById('delete-project-btn').classList.toggle('hidden', !canDelete);
+      document.getElementById('edit-project-btn').onclick = () => editProject(id);
+      document.getElementById('delete-project-btn').onclick = () => deleteProject(id);
+
+      // Render DPRs
+      const dprs = p.DailyReports || [];
+      renderDPRs(dprs);
+    } finally {
+      if (triggerBtn) setButtonLoading(triggerBtn, false, 'View Details', 'Opening');
+      endRequest(requestKey);
+    }
+  }
+
+  function renderDPRs(dprs) {
+    const container = document.getElementById('dpr-container');
+    if (!dprs.length) {
+      container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No reports yet</div></div>`;
+      return;
+    }
+    container.innerHTML = `<div class="dpr-list">${dprs.map(dpr => `
+      <div class="dpr-card">
+        <div>
+          <div class="dpr-date">${dpr.date}</div>
+        </div>
+        <div class="dpr-info">
+          <div class="dpr-desc">${dpr.work_description}</div>
+          <div class="dpr-tags">
+            ${dpr.weather ? `<span class="dpr-tag">☀️ ${dpr.weather}</span>` : ''}
+            ${dpr.worker_count ? `<span class="dpr-tag">👷 ${dpr.worker_count} workers</span>` : ''}
+            <span class="dpr-tag">By ${dpr.reporter?.name || 'Unknown'}</span>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deleteDPR(${dpr.id}, event)">✕</button>
+      </div>`).join('')}</div>`;
+  }
+
+  function backToProjects() {
+    document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('projects-page').style.display = 'block';
+    currentProjectId = null;
+  }
+
+  // ── Create / Edit Project ──
+  function openProjectModal(project = null) {
+    document.getElementById('edit-project-id').value = project?.id || '';
+    document.getElementById('proj-name').value = project?.name || '';
+    document.getElementById('proj-desc').value = project?.description || '';
+    document.getElementById('proj-start').value = project?.start_date || '';
+    document.getElementById('proj-end').value = project?.end_date || '';
+    document.getElementById('proj-status').value = project?.status || 'planned';
+    document.getElementById('project-modal-title').textContent = project ? 'Edit Project' : 'New Project';
+    document.getElementById('project-submit-btn').textContent = project ? 'Update Project →' : 'Create Project →';
+    document.getElementById('project-modal').classList.remove('hidden');
+  }
+
+  async function editProject(id, e) {
+    if (e) e.stopPropagation();
+    const requestKey = `project-edit-load-${id}`;
+    if (!startRequest(requestKey)) return;
+    const triggerBtn = e?.currentTarget || null;
+    if (triggerBtn) setButtonLoading(triggerBtn, true, 'Edit', 'Loading');
+
+    try {
+      const res = await api(`/projects/${id}`);
+      if (res.project) openProjectModal(res.project);
+    } finally {
+      if (triggerBtn) setButtonLoading(triggerBtn, false, 'Edit', 'Loading');
+      endRequest(requestKey);
+    }
+  }
+
+  async function submitProject() {
+    const submitBtn = document.getElementById('project-submit-btn');
+    const id = document.getElementById('edit-project-id').value;
+    const requestKey = `project-submit-${id || 'new'}`;
+    const body = {
+      name: document.getElementById('proj-name').value.trim(),
+      description: document.getElementById('proj-desc').value.trim(),
+      start_date: document.getElementById('proj-start').value,
+      end_date: document.getElementById('proj-end').value,
+      status: document.getElementById('proj-status').value,
+    };
+    if (!body.name) return toast('Project name is required', 'error');
+    if (!startRequest(requestKey)) return;
+
+    setButtonLoading(
+      submitBtn,
+      true,
+      id ? 'Update Project →' : 'Create Project →',
+      id ? 'Updating' : 'Creating'
+    );
+
+    try {
+      const res = id
+        ? await api(`/projects/${id}`, 'PUT', body)
+        : await api('/projects', 'POST', body);
+
+      if (res.projectId || res.project) {
+        toast(id ? 'Project updated!' : 'Project created!', 'success');
+        closeModal('project-modal');
+        loadProjects();
+        if (id && currentProjectId == id) viewProject(id);
+      } else {
+        toast(res.error || 'Something went wrong', 'error');
+      }
+    } finally {
+      setButtonLoading(
+        submitBtn,
+        false,
+        id ? 'Update Project →' : 'Create Project →',
+        id ? 'Updating' : 'Creating'
+      );
+      endRequest(requestKey);
+    }
+  }
+
+  async function deleteProject(id, e) {
+    if (e) e.stopPropagation();
+    const requestKey = `project-delete-${id}`;
+    const triggerBtn = e?.currentTarget || document.getElementById('delete-project-btn');
+    const defaultLabel = triggerBtn?.textContent?.trim() || 'Delete';
+    if (!confirm('Delete this project? This cannot be undone.')) return;
+    if (!startRequest(requestKey)) return;
+
+    if (triggerBtn) setButtonLoading(triggerBtn, true, defaultLabel, 'Deleting');
+    try {
+      const res = await api(`/projects/${id}`, 'DELETE');
+      if (res.message) {
+        toast('Project deleted', 'success');
+        if (currentProjectId == id) backToProjects();
+        loadProjects();
+      } else {
+        toast(res.error || 'Delete failed', 'error');
+      }
+    } finally {
+      if (triggerBtn) setButtonLoading(triggerBtn, false, defaultLabel, 'Deleting');
+      endRequest(requestKey);
+    }
+  }
+
+  // ── DPR ──
+  function openDPRModal() {
+    document.getElementById('dpr-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('dpr-desc').value = '';
+    document.getElementById('dpr-weather').value = '';
+    document.getElementById('dpr-workers').value = '';
+    document.getElementById('dpr-modal').classList.remove('hidden');
+  }
+
+  async function submitDPR() {
+    const submitBtn = document.getElementById('dpr-submit-btn');
+    const requestKey = `dpr-submit-${currentProjectId}`;
+    const body = {
+      date: document.getElementById('dpr-date').value,
+      work_description: document.getElementById('dpr-desc').value.trim(),
+      weather: document.getElementById('dpr-weather').value.trim(),
+      worker_count: parseInt(document.getElementById('dpr-workers').value) || null,
+    };
+    if (!body.date || !body.work_description) return toast('Date and description are required', 'error');
+    if (!startRequest(requestKey)) return;
+
+    setButtonLoading(submitBtn, true, 'Submit Report →', 'Submitting');
+    try {
+      const res = await api(`/projects/${currentProjectId}/dpr`, 'POST', body);
+      if (res.dprId) {
+        toast('Report submitted!', 'success');
+        closeModal('dpr-modal');
+        // Reload DPRs
+        const pRes = await api(`/projects/${currentProjectId}`);
+        renderDPRs(pRes.project?.DailyReports || []);
+      } else {
+        toast(res.error || 'Failed to submit report', 'error');
+      }
+    } finally {
+      setButtonLoading(submitBtn, false, 'Submit Report →', 'Submitting');
+      endRequest(requestKey);
+    }
+  }
+
+  async function deleteDPR(dprId, e) {
+    const requestKey = `dpr-delete-${dprId}`;
+    const triggerBtn = e?.currentTarget || null;
+    if (!confirm('Delete this report?')) return;
+    if (!startRequest(requestKey)) return;
+
+    if (triggerBtn) setButtonLoading(triggerBtn, true, '✕', '...');
+    try {
+      const res = await api(`/projects/${currentProjectId}/dpr/${dprId}`, 'DELETE');
+      if (res.message) {
+        toast('Report deleted', 'success');
+        const pRes = await api(`/projects/${currentProjectId}`);
+        renderDPRs(pRes.project?.DailyReports || []);
+      } else {
+        toast(res.error || 'Delete failed', 'error');
+      }
+    } finally {
+      if (triggerBtn) setButtonLoading(triggerBtn, false, '✕', '...');
+      endRequest(requestKey);
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // HELPERS
+  // ══════════════════════════════════════════
+  async function api(path, method = 'GET', body = null, auth = true) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth && token) headers['Authorization'] = `Bearer ${token}`;
+    try {
+      const res = await fetch(API + path, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      return await res.json();
+    } catch (err) {
+      return { error: 'Cannot connect to server. Is it running?' };
+    }
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+  }
+
+  function startRequest(key) {
+    if (pendingRequests.has(key)) return false;
+    pendingRequests.add(key);
+    return true;
+  }
+
+  function endRequest(key) {
+    pendingRequests.delete(key);
+  }
+
+  function setButtonLoading(button, isLoading, defaultLabel, loadingLabel) {
+    if (!button) return;
+    if (isLoading) {
+      button.disabled = true;
+      button.classList.add('btn-loading');
+      button.innerHTML = `<span class="spinner" aria-hidden="true"></span> ${loadingLabel}`;
+      return;
+    }
+
+    button.disabled = false;
+    button.classList.remove('btn-loading');
+    button.textContent = defaultLabel;
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.add('hidden');
+    });
+  });
+
+  function toast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+</script>
+</body>
+</html>
